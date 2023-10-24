@@ -4,7 +4,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Cart } from './cart.entity';
@@ -15,6 +14,8 @@ export class DetailFoodInCart {
   id: number;
   @Column({ name: 'amount' })
   amount: number;
+  @Column({ name: 'total', nullable: true })
+  total: number;
   @ManyToOne(() => Food, (food) => food.detailFoodInCart, {
     onDelete: 'CASCADE',
   })

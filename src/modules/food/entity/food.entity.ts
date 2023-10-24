@@ -7,6 +7,7 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -24,7 +25,7 @@ export class Food {
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.listFood)
   @JoinColumn({ name: 'restaurantId' })
   restaurant: Restaurant;
-  @OneToOne(
+  @OneToMany(
     () => DetailFoodInCart,
     (detailFoodInCart) => detailFoodInCart.foodInCart,
   )

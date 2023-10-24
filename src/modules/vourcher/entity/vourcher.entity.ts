@@ -1,10 +1,12 @@
 import { Restaurant } from 'src/modules/restaurant/entity/restarant.entity';
+import { User } from 'src/modules/user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity({ name: 'vouchers' })
@@ -20,7 +22,10 @@ export class Voucher {
 
   @Column({ name: 'min_order_amount' })
   minOrderAmount: number;
-
-  @ManyToOne(() => Restaurant, (restaurant) => restaurant.vouchers)
+  @ManyToOne(() => User, (user) => user)
+  @JoinColumn({ name: 'userId' })
+  author: User;
+  @ManyToOne(() => Restaurant, (restaurant) => restaurant.listVoucher)
+  @JoinColumn({ name: 'restaurantId' })
   restaurant: Restaurant;
 }

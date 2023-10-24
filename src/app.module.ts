@@ -7,6 +7,9 @@ import { AuthenticationModule } from './modules/authentication/authentication.mo
 import { RestaurantModule } from './modules/restaurant/restaurant.module';
 import { CartModule } from './modules/cart/cart.module';
 import { FoodModule } from './modules/food/food.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { BillModule } from './modules/bill/bill.module';
+import { VoucherMoudle } from './modules/vourcher/voucher.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { FoodModule } from './modules/food/food.module';
     AuthenticationModule,
     RestaurantModule,
     FoodModule,
+    NotificationModule,
+    BillModule,
+    VoucherMoudle,
   ],
   controllers: [AppController],
   providers: [AppService],

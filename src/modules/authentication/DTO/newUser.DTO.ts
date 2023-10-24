@@ -5,7 +5,8 @@ export class NewUserDTO {
   username: string;
   @ApiProperty()
   password: string;
-
+  email: string;
+  phoneNumber: string;
   role: string;
 }
 export class LogIn {

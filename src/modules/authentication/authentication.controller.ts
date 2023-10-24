@@ -16,6 +16,9 @@ import { UserService } from '../user/user.service';
 import { LocalAuthenticationGuard } from 'src/guard/localAuthentication.guard';
 import { ApiTags } from '@nestjs/swagger';
 import JwtAuthenticationGuard from 'src/guard/jwt-authentication.guard';
+import { Auth } from 'src/decorator/roles.decorator';
+import { Role } from 'src/Enum/role.enum';
+import { NewRestaurant } from './DTO/newRestaurant.dto';
 @ApiTags('Authentication')
 @Controller()
 export class AuthenticationController {
@@ -55,5 +58,15 @@ export class AuthenticationController {
       request.user.username,
     );
     return { accessToken: accsessToken };
+  }
+  @Auth(Role.User)
+  @Post('/registerowner')
+  async registerOwner(@Req() request, @Body() newRestaurant: NewRestaurant) {
+    const restaurant: any = await this.authenticationservice.registerOwner(
+      request.user.username,
+      newRestaurant,
+    );
+
+    return new HttpException(restaurant, HttpStatus.OK);
   }
 }

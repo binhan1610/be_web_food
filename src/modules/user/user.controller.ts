@@ -45,4 +45,9 @@ export class UserController {
       HttpStatus.OK,
     );
   }
+  @Post('vip/:id')
+  async registerUserVip(@Param('id') id: number) {
+    const user = await this.userService.registerVipUser(id);
+    return new HttpException('register success', HttpStatus.OK);
+  }
 }

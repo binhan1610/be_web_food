@@ -12,8 +12,11 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   constructor(private readonly userservice: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      //lấy token từ header
       secretorkey: JWT_SECRET_REFRESH_TOKEN,
+      //sercerkey
       passReqToCallback: true,
+      //truy cập thông tin từ yêu câu request:Request
     });
   }
   async validate(request: Request, payload: TokenPayload) {

@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { DetailFoodInCart } from './detailfoodincart.entity';
+import { Bill } from 'src/modules/bill/entity/bill.entity';
 
 @Entity({ name: 'carts' })
 export class Cart {
@@ -24,6 +25,9 @@ export class Cart {
   @OneToMany(
     () => DetailFoodInCart,
     (detailFoodInCart) => detailFoodInCart.cart,
+    { cascade: true, eager: true },
   )
   detailFood: DetailFoodInCart[];
+  @OneToOne(() => Bill, (bill) => bill.cart)
+  billOfCart: Bill;
 }

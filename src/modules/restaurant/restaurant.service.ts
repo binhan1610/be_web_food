@@ -2,25 +2,48 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Restaurant } from './entity/restarant.entity';
 import { Repository } from 'typeorm';
+import { NewRestaurant } from '../authentication/DTO/newRestaurant.dto';
+import { RestaurantOwner } from './entity/restaurantOwner.entity';
+import { User } from '../user/entities/user.entity';
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurantRepository: Repository<Restaurant>,
+    @InjectRepository(RestaurantOwner)
+    private readonly restaurantOwnerRepository: Repository<RestaurantOwner>,
   ) {}
-  async addRestaurant(username: string, restaurantName: string) {
-    const restaurant = await this.restaurantRepository.findOneBy({
-      restaurantName,
-    });
-    if (restaurant) {
-      throw new HttpException('Do Exist', HttpStatus.BAD_REQUEST);
+  async addRestaurant(user: User, newRestaurant: NewRestaurant) {
+    if (user.owner) {
     }
-    const newRestaurant = new Restaurant();
-    newRestaurant.restaurantName = restaurantName;
-    newRestaurant.owner = username;
+    const checkRestaurant = await this.restaurantRepository.findOneBy({
+      restaurantName: newRestaurant.restaurantName,
+    });
+
+    if (checkRestaurant) {
+      // return false;
+      throw new HttpException('restaurant does exist', HttpStatus.BAD_REQUEST);
+    }
+
+    const restaurant = new Restaurant();
+
+    restaurant.address = newRestaurant.address;
+    restaurant.restaurantName = newRestaurant.restaurantName;
+    restaurant.typeOfFood = newRestaurant.typeOfFood;
+    const owner = new RestaurantOwner();
+    owner.author = user;
+    owner.restaurant = restaurant;
+    restaurant.owner = owner;
+    // newRestaurant1.owner = username;
+
     try {
-      await this.restaurantRepository.save(newRestaurant);
-      return newRestaurant;
+      await this.restaurantOwnerRepository.save(owner);
+      await this.restaurantRepository.save(restaurant);
+      const resRestaurant = await this.restaurantRepository.findOneBy({
+        restaurantName: newRestaurant.restaurantName,
+      });
+
+      return resRestaurant;
     } catch (error) {
       console.log(error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
@@ -39,7 +62,13 @@ export class RestaurantService {
       total,
     };
   }
-  async findOneRestaurantById(id) {
+  async findOneRestaurantByRestaurantName(restaurantName: string) {
+    const restaurant = await this.restaurantRepository.findOneBy({
+      restaurantName,
+    });
+    return restaurant;
+  }
+  async findOneRestaurantById(id: number) {
     const restaurant = await this.restaurantRepository.findOneBy({
       id,
     });

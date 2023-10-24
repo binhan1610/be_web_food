@@ -8,8 +8,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './DTO/updateUser.dto';
-import { use } from 'passport';
-
+import * as moment from 'moment-timezone';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
@@ -116,5 +115,39 @@ export class UserService {
     } catch (error) {
       console.log(error);
     }
+  }
+  public async registerVipUser(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    console.log(user);
+
+    if (user.userVip.isVip) {
+      throw new HttpException(
+        'User has already been a VIP user',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Lấy ngày giờ hiện tại ở múi giờ Việt Nam ('Asia/Ho_Chi_Minh')
+    const vietnamTime = moment().tz('Asia/Ho_Chi_Minh');
+    console.log(vietnamTime.format());
+
+    const expirationDate = vietnamTime.clone().add(1, 'months');
+
+    // Đặt trạng thái isVip và expirationDate
+    user.userVip.isVip = true;
+    user.userVip.registrationDate = vietnamTime.format(); // Định dạng thành chuỗi ISO8601
+    user.userVip.expirationDate = expirationDate.format();
+    // Lưu thay đổi vào cơ sở dữ liệu
+    await this.userRepository.save(user);
+    return user;
+  }
+  public async checkOwner(username: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('users')
+      .where('users.username=:username', { username })
+      .leftJoinAndSelect('users.owner', 'owner')
+      .getOne();
+    console.log(user.owner);
+    return user;
   }
 }
