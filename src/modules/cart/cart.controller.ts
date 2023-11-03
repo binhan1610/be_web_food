@@ -20,8 +20,6 @@ export class CartController {
 
   @Post()
   async addFoodToCart(@Body() food: FoodDto, @Req() request) {
-    console.log(request.user);
-
     const cart = await this.cartService.addFoodToCart(
       request.user.username,
       food.foodId,
@@ -34,7 +32,7 @@ export class CartController {
     await this.cartService.deleteCart(id);
     return new HttpException('Delete Success', HttpStatus.OK);
   }
-  @Get(':id')
+  @Get('/:id')
   async getDetailCartbyUserId(@Param('id') id: number) {
     const detailCart = await this.cartService.getCartByIdUser(id);
     return new HttpException(detailCart, HttpStatus.OK);
@@ -58,5 +56,10 @@ export class CartController {
 
     const newCart = await this.cartService.reduceAmountFood(idCart, idFood);
     return new HttpException(newCart, HttpStatus.OK);
+  }
+  @Get('/order/ordered')
+  async ordered(@Req() request) {
+    const cart = await this.cartService.ordered(request.user.username);
+    return new HttpException(cart, HttpStatus.OK);
   }
 }

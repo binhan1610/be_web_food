@@ -45,7 +45,7 @@ export class VoucherService {
       .orderBy('restaurants.id', 'ASC')
       .take(20)
       .skip(0)
-      .getMany();
+      .getOne();
     return listVoucher;
   }
 }

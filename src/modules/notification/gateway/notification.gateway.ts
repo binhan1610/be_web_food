@@ -1,58 +1,62 @@
+import { InjectRepository } from '@nestjs/typeorm';
 import {
-  SubscribeMessage,
   WebSocketGateway,
+  SubscribeMessage,
   WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  MessageBody,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
+import { UserInRestaurant } from '../entity/listuserinroom.entity';
+import { Repository } from 'typeorm';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class NotificationGateWay
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class ChatGateway {
+  constructor(
+    @InjectRepository(UserInRestaurant)
+    private readonly uirRepository: Repository<UserInRestaurant>,
+  ) {}
   @WebSocketServer() server: Server;
-
-  private users: string[] = [];
-
-  handleConnection(client: Socket) {
-    // Khi có kết nối mới, gửi danh sách người dùng hiện tại đến client
-    client.emit('users', this.users);
-  }
-
-  handleDisconnect(client: Socket) {
-    // Khi kết nối bị đóng, xóa người dùng khỏi danh sách
-    const index = this.users.indexOf(client.id);
-    if (index !== -1) {
-      this.users.splice(index, 1);
+  @SubscribeMessage('joinRoom')
+  handleJoinRoom(
+    client: Socket,
+    payload: { userId?: string; restaurantId: string },
+  ) {
+    if (!payload.userId) {
+      const room = `${payload.restaurantId}`;
+      client.join(room);
+      console.log(`Client joined room: ${room}`);
+    } else {
+      const room = `${payload.restaurantId}-${payload.userId}`;
+      client.to(`${payload.restaurantId}`).emit('newCustomerJoin', payload);
+      client.join(room);
+      console.log(`Client joined room: ${room}`);
     }
-    // Gửi danh sách người dùng mới đến tất cả clients
-    this.server.emit('users', this.users);
   }
 
-  @SubscribeMessage('join')
-  handleJoinRoom(client: Socket, username: string) {
-    // Xử lý khi người dùng tham gia phòng chat
-    client['username'] = username;
-    this.users.push(username);
-    // Gửi danh sách người dùng mới đến tất cả clients
-    this.server.emit('users', this.users);
+  @SubscribeMessage('sendPrivateMessage')
+  handleSendPrivateMessage(
+    client: Socket,
+    data: {
+      senderId: string;
+      receiverId: string;
+      newMessage: {
+        message: string;
+        position: string;
+      };
+      room: string;
+    },
+  ) {
+    console.log(data.newMessage);
+
+    const room = `${data.senderId}-${data.receiverId}`; // Tạo tên phòng chat dựa trên thông tin người gửi và người nhận
+    client.to(data.room).emit('privateMessage', data.newMessage);
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: Socket, message: string) {
-    // Xử lý khi người dùng gửi tin nhắn
-    // Sau đó, bạn gửi lại tin nhắn đó cho tất cả người dùng trong phòng
-    const username = client['username'];
-    this.server.emit('message', { username, message });
-  }
-  @SubscribeMessage('notification')
-  handleNotification(@MessageBody() message: string) {
-    this.server.emit('notification', message);
+  @SubscribeMessage('leaveRestaurantRoom')
+  async handerleaveRestaurantRoom(client: Socket, userId: number) {
+    await this.uirRepository.delete({ userId: userId });
   }
 }

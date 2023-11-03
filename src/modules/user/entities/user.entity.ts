@@ -25,17 +25,16 @@ export class User {
   email: string;
   @Column({ name: 'refreshToken', nullable: true, select: false })
   refreshToken: string;
-  @OneToOne(() => Cart, (cart) => cart.author, { cascade: true })
+  @OneToOne(() => Cart, (cart) => cart.author, { onDelete: 'CASCADE' })
   cart: Cart;
   @Column({ name: 'roles', type: 'text', array: true, nullable: true })
   roles: string[];
   @OneToMany(() => Voucher, (voucher) => voucher.author, {
-    cascade: true,
+    onDelete: 'CASCADE',
   })
   listVoucher: Voucher[];
   @OneToOne(() => UserVip, (userVip) => userVip.author, {
-    cascade: true,
-    eager: true,
+    onDelete: 'CASCADE',
   })
   userVip: UserVip;
   @OneToMany(() => Bill, (bill) => bill.author)

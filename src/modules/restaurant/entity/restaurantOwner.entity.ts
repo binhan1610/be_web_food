@@ -12,10 +12,11 @@ import { User } from 'src/modules/user/entities/user.entity';
 export class RestaurantOwner {
   @PrimaryGeneratedColumn()
   id: number;
-  @OneToOne(() => Restaurant, (restaurant) => restaurant.owner)
+  @OneToOne(() => Restaurant, (restaurant) => restaurant.owner, {
+    onDelete: 'CASCADE',
+  })
   restaurant: Restaurant;
   @OneToOne(() => User, (user) => user.owner)
   @JoinColumn({ name: 'userId' })
   author: User;
 }
-

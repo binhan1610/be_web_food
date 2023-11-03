@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RestaurantOwner } from './restaurantOwner.entity';
+import { Cart } from 'src/modules/cart/entities/cart.entity';
 
 @Entity({ name: 'restaurants' })
 export class Restaurant {
@@ -20,7 +21,7 @@ export class Restaurant {
   address: string;
   @Column({ name: 'typeOfFood', nullable: true })
   typeOfFood: string;
-  @OneToMany(() => Food, (foods) => foods.restaurant, { cascade: ['remove'] })
+  @OneToMany(() => Food, (foods) => foods.restaurant, { onDelete: 'CASCADE' })
   listFood: Food[];
   @OneToOne(
     () => RestaurantOwner,
@@ -29,7 +30,9 @@ export class Restaurant {
   @JoinColumn({ name: 'idOwner' })
   owner: RestaurantOwner;
   @OneToMany(() => Voucher, (voucher) => voucher.restaurant, {
-    cascade: ['remove'],
+    onDelete: 'CASCADE',
   })
   listVoucher: Voucher[];
+  @OneToMany(() => Cart, (cart) => cart.restaurant)
+  listOrder: Cart[];
 }

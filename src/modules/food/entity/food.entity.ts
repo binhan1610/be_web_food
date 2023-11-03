@@ -28,6 +28,7 @@ export class Food {
   @OneToMany(
     () => DetailFoodInCart,
     (detailFoodInCart) => detailFoodInCart.foodInCart,
+    { onDelete: 'CASCADE' },
   )
   detailFoodInCart: DetailFoodInCart;
 }

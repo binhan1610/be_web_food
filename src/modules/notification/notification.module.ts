@@ -1,9 +1,12 @@
 import { NotificationController } from './notifcation.controller';
 import { Module } from '@nestjs/common';
-import { NotificationGateWay } from './gateway/notification.gateway';
+import { ChatGateway } from './gateway/notification.gateway';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserInRestaurant } from './entity/listuserinroom.entity';
 
 @Module({
-  providers: [NotificationGateWay],
+  imports: [TypeOrmModule.forFeature([UserInRestaurant])],
+  providers: [ChatGateway],
   controllers: [NotificationController],
 })
 export class NotificationModule {}

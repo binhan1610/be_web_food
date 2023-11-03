@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { NewRestaurant } from '../authentication/DTO/newRestaurant.dto';
 import { RestaurantOwner } from './entity/restaurantOwner.entity';
 import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
 @Injectable()
 export class RestaurantService {
   constructor(
@@ -48,6 +49,20 @@ export class RestaurantService {
       console.log(error);
       throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
+  }
+  public async getAllOwner(offset?: number, limit?: number) {
+    const [data, total]: [RestaurantOwner[], number] =
+      await this.restaurantOwnerRepository
+        .createQueryBuilder('restaurantOwner')
+        .leftJoinAndSelect('restaurantOwner.author', 'author')
+        .take(limit ? limit : 100)
+        .skip(offset ? offset : 0)
+        .orderBy('restaurantOwner.id', 'ASC')
+        .getManyAndCount();
+    return {
+      data,
+      total,
+    };
   }
   async getAllRestaurnat(offset?: number, limit?: number) {
     const [data, total]: [Restaurant[], number] =
@@ -94,7 +109,7 @@ export class RestaurantService {
       total,
     };
   }
-  async getListFood(id: number) {
+  public async getListFood(id: number) {
     try {
       const listFood = await this.restaurantRepository
         .createQueryBuilder('restaurants')
@@ -103,10 +118,27 @@ export class RestaurantService {
         .orderBy('restaurants.id', 'ASC')
         .take(20)
         .skip(0)
-        .getMany();
+        .getOne();
       return listFood;
     } catch (error) {
       console.log(error);
     }
+  }
+  public async getRestaurantByUser(username: string) {
+    const owner = await this.restaurantOwnerRepository
+      .createQueryBuilder('restaurantOwner')
+      .leftJoinAndSelect('restaurantOwner.author', 'author')
+      .where('author.username=:username', {
+        username,
+      })
+      .getOne();
+
+    const restaurant = await this.restaurantRepository
+      .createQueryBuilder('restaurants')
+      .leftJoinAndSelect('restaurants.owner', 'owner')
+      .where('restaurants.owner.id=:id', { id: owner.id })
+      .getOne();
+
+    return restaurant;
   }
 }

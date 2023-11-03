@@ -29,4 +29,12 @@ export class FoodService {
     const food = await this.foodRepository.findOneBy({ id });
     return food;
   }
+  async getRestaurantByFood(foodId: number) {
+    const food = await this.foodRepository
+      .createQueryBuilder('foods')
+      .leftJoinAndSelect('foods.restaurant', 'restaurants')
+      .where('foods.id=:id', { id: foodId })
+      .getOne();
+    return food.restaurant;
+  }
 }

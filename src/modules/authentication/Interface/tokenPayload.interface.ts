@@ -1,3 +1,3 @@
-interface TokenPayload{
-   username:string
+interface TokenPayload {
+  username: string;
 }

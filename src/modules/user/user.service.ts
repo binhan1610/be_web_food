@@ -62,7 +62,7 @@ export class UserService {
     refreshToken: string,
     username: string,
   ) {
-    const user = await this.getUserByUsername(username);
+    const user = await this.getRefreshTokenByUsername(username);
     const ifRefreshTokenMatch = await bcrypt.compare(
       refreshToken,
       user.refreshToken,
@@ -83,7 +83,7 @@ export class UserService {
       return user;
     } catch (error) {
       console.log(error);
-      return new HttpException('', HttpStatus.BAD_REQUEST);
+      throw new HttpException('', HttpStatus.BAD_REQUEST);
     }
   }
   public async addRoleUser(username: string, newRole: string) {

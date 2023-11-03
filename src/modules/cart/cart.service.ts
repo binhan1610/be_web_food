@@ -17,15 +17,18 @@ export class CartService {
   async addFoodToCart(username: string, idFood: number, totalFood: number) {
     const user = await this.userService.getUserByUsername(username);
     const food = await this.foodServide.findFoodById(idFood);
+    const restaurant = await this.foodServide.getRestaurantByFood(idFood);
     let cart = await this.cartRepository.findOne({
       where: { author: { id: user.id } },
     });
-    console.log(cart);
+
     if (!cart) {
       cart = await this.cartRepository.create({
+        status: 'orderring',
         author: user,
         detailFood: [],
         total: 0,
+        restaurant: restaurant,
       });
       await this.cartRepository.save(cart);
     }
@@ -33,6 +36,7 @@ export class CartService {
       where: { cart: { id: cart.id }, foodInCart: { id: idFood } },
     });
     console.log(detailFoodInCart);
+
     const totalInDetailFoodInCart = food.total * totalFood;
     if (!detailFoodInCart) {
       detailFoodInCart = await this.detailRepository.create({
@@ -41,21 +45,26 @@ export class CartService {
         foodInCart: food,
         total: totalInDetailFoodInCart,
       });
+      cart.detailFood.push(detailFoodInCart);
     } else {
       detailFoodInCart.amount += Number(totalFood);
       detailFoodInCart.total += Number(totalInDetailFoodInCart);
     }
-    await this.detailRepository.save(detailFoodInCart);
-
+    console.log(detailFoodInCart);
     cart.total += food.total * totalFood;
-    await this.cartRepository.save(cart);
-    // const resCart = await this.cartRepository
-    //   .createQueryBuilder('carts')
-    //   .where('carts.author=:id', { id: user.id })
-    //   .leftJoinAndSelect('carts.detailFood', 'detailFood')
-    //   .getOne();
-    // return resCart;
-    return cart;
+    try {
+      await this.detailRepository.save(detailFoodInCart);
+
+      await this.cartRepository.save(cart);
+    } catch (error) {
+      console.log(error);
+    }
+    const resCart = await this.cartRepository
+      .createQueryBuilder('carts')
+      .where('carts.author=:id', { id: user.id })
+      .leftJoinAndSelect('carts.detailFood', 'detailFood')
+      .getOne();
+    return resCart;
   }
 
   async deleteCart(id: number) {
@@ -154,5 +163,16 @@ export class CartService {
       .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
       .getOne();
     return detailCart;
+  }
+  async ordered(username: string) {
+    const user = await this.userService.getUserByUsername(username);
+    console.log(user);
+
+    let cart = await this.getCartByIdUser(user.id);
+
+    cart.status = 'ordered';
+    await this.cartRepository.save(cart);
+
+    return cart;
   }
 }

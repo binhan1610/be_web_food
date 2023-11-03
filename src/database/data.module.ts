@@ -10,6 +10,7 @@ import { UserVip } from 'src/modules/user/entities/vipuser.entity';
 import { Voucher } from 'src/modules/vourcher/entity/vourcher.entity';
 import { Bill } from 'src/modules/bill/entity/bill.entity';
 import { RestaurantOwner } from 'src/modules/restaurant/entity/restaurantOwner.entity';
+import { UserInRestaurant } from 'src/modules/notification/entity/listuserinroom.entity';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RestaurantOwner } from 'src/modules/restaurant/entity/restaurantOwner.e
         Voucher,
         Bill,
         RestaurantOwner,
+        UserInRestaurant,
       ],
       synchronize: true,
     }),

@@ -34,22 +34,18 @@ export class AuthenticationController {
   @Post('login')
   @UseGuards(LocalAuthenticationGuard)
   async login(@Body() user: LogIn) {
-    console.log(user);
-
-    const accessToekn = await this.authenticationservice.getJWTToken(
+    const accessToken = await this.authenticationservice.getJWTToken(
       user.username,
     );
-    const refreshtoken = await this.authenticationservice.getJWTRefreshToken(
+    const refreshToken = await this.authenticationservice.getJWTRefreshToken(
       user.username,
     );
-    await this.userservice.setCurrentRefreshToken(refreshtoken, user.username);
-    const data = [
-      {
-        accessToekn: accessToekn,
-        refreshtoken: refreshtoken,
-      },
-    ];
-    return new HttpException({ message: 'login success', data }, HttpStatus.OK);
+    await this.userservice.setCurrentRefreshToken(refreshToken, user.username);
+    const data = {
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
+    return new HttpException(data, HttpStatus.OK);
   }
   @UseGuards(JwtAuthenticationGuard)
   @Get('refresh')
@@ -68,5 +64,10 @@ export class AuthenticationController {
     );
 
     return new HttpException(restaurant, HttpStatus.OK);
+  }
+  @Auth(Role.Owner)
+  @Get('owner')
+  async getRoleOwner() {
+    return true;
   }
 }

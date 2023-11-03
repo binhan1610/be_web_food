@@ -7,10 +7,13 @@ import {
   Param,
   Post,
   Put,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiTags, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { UpdateUserDto } from './DTO/updateUser.dto';
+import { Auth } from 'src/decorator/roles.decorator';
+import { Role } from 'src/Enum/role.enum';
 @ApiBearerAuth()
 @ApiTags('User')
 @Controller('user')
@@ -49,5 +52,10 @@ export class UserController {
   async registerUserVip(@Param('id') id: number) {
     const user = await this.userService.registerVipUser(id);
     return new HttpException('register success', HttpStatus.OK);
+  }
+  @Get()
+  @Auth(Role.User)
+  async getRoleUser() {
+    return true;
   }
 }

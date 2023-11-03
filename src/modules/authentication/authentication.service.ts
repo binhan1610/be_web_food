@@ -122,4 +122,8 @@ export class AuthenticationService {
       console.log(error);
     }
   }
+  public async getRole(username: string) {
+    const user = await this.userService.getUserByUsername(username);
+    return user.roles;
+  }
 }

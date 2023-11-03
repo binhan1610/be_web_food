@@ -6,6 +6,7 @@ import { UserModule } from '../user/user.module';
 import { CartService } from './cart.service';
 import { CartController } from './cart.controller';
 import { DetailFoodInCart } from './entities/detailfoodincart.entity';
+import { RestaurantModule } from '../restaurant/restaurant.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Cart, DetailFoodInCart]),
