@@ -5,8 +5,13 @@ import { RestaurantService } from './restaurant.service';
 import { RestaurantController } from './restaurant.controller';
 import { RestaurantOwner } from './entity/restaurantOwner.entity';
 import { UserModule } from '../user/user.module';
+import { FirebaseModule } from 'src/firebase/firebase.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Restaurant, RestaurantOwner])],
+  imports: [
+    TypeOrmModule.forFeature([Restaurant, RestaurantOwner]),
+    FirebaseModule,
+  ],
   exports: [RestaurantService],
   providers: [RestaurantService],
   controllers: [RestaurantController],

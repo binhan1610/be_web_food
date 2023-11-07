@@ -1,19 +1,28 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Restaurant } from './entity/restarant.entity';
 import { Repository } from 'typeorm';
 import { NewRestaurant } from '../authentication/DTO/newRestaurant.dto';
 import { RestaurantOwner } from './entity/restaurantOwner.entity';
 import { User } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
+import {
+  CLIENT_EMAIL,
+  PRIVATE_KEY,
+  PROJECT_ID,
+  STORAGE_BUCKET_URL,
+} from 'src/configs/config';
+
+import * as admin from 'firebase-admin';
 @Injectable()
 export class RestaurantService {
   constructor(
+    @Inject('FirebaseAdmin') private readonly admin: admin.app.App,
     @InjectRepository(Restaurant)
     private readonly restaurantRepository: Repository<Restaurant>,
     @InjectRepository(RestaurantOwner)
     private readonly restaurantOwnerRepository: Repository<RestaurantOwner>,
   ) {}
+
   async addRestaurant(user: User, newRestaurant: NewRestaurant) {
     if (user.owner) {
     }
@@ -27,7 +36,7 @@ export class RestaurantService {
     }
 
     const restaurant = new Restaurant();
-
+    restaurant.rate = 5;
     restaurant.address = newRestaurant.address;
     restaurant.restaurantName = newRestaurant.restaurantName;
     restaurant.typeOfFood = newRestaurant.typeOfFood;
@@ -139,6 +148,41 @@ export class RestaurantService {
       .where('restaurants.owner.id=:id', { id: owner.id })
       .getOne();
 
+    return restaurant;
+  }
+  async uploadFile(
+    localFilePath: string,
+    destination: string,
+  ): Promise<string> {
+    const storage = this.admin.storage().bucket();
+
+    await storage.upload(localFilePath, { destination });
+
+    const file = storage.file(destination);
+    const url = await file.getSignedUrl({
+      action: 'read',
+      expires: Date.now() + 10 * 60 * 60 * 1000,
+    });
+    return url[0];
+  }
+  async setAvatarRestaurant(idRestaurant: number, url: string) {
+    const restaurant = await this.restaurantRepository.findOneBy({
+      id: idRestaurant,
+    });
+    if (!restaurant)
+      throw new HttpException('restaurant not found', HttpStatus.BAD_REQUEST);
+    restaurant.imgAvatar = url;
+    await this.restaurantRepository.save(restaurant);
+    return restaurant;
+  }
+  async setBackgroundRestaurant(idRestaurant: number, url: string) {
+    const restaurant = await this.restaurantRepository.findOneBy({
+      id: idRestaurant,
+    });
+    if (!restaurant)
+      throw new HttpException('restaurant not found', HttpStatus.BAD_REQUEST);
+    restaurant.imgBackground = url;
+    await this.restaurantRepository.save(restaurant);
     return restaurant;
   }
 }

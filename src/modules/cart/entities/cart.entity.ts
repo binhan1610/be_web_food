@@ -12,6 +12,8 @@ import {
 import { DetailFoodInCart } from './detailfoodincart.entity';
 import { Bill } from 'src/modules/bill/entity/bill.entity';
 import { Restaurant } from 'src/modules/restaurant/entity/restarant.entity';
+import { HistoryOrder } from 'src/modules/historyorder/entity/historyorder.entity';
+import { Payment } from 'src/modules/payment/entity/payment.entity';
 
 @Entity({ name: 'carts' })
 export class Cart {
@@ -36,4 +38,6 @@ export class Cart {
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.listOrder)
   @JoinColumn({ name: 'restaurantId' })
   restaurant: Restaurant;
+  @OneToOne(() => Payment, (payment) => payment.cart)
+  payment: Payment;
 }

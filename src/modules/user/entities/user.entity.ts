@@ -3,7 +3,6 @@ import { Voucher } from 'src/modules/vourcher/entity/vourcher.entity';
 import {
   Column,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   OneToOne,
@@ -11,6 +10,8 @@ import {
 import { UserVip } from './vipuser.entity';
 import { Bill } from 'src/modules/bill/entity/bill.entity';
 import { RestaurantOwner } from 'src/modules/restaurant/entity/restaurantOwner.entity';
+import { Payment } from 'src/modules/payment/entity/payment.entity';
+import { Comment } from 'src/modules/comment/entity/comment.entity';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -41,4 +42,8 @@ export class User {
   billOfUser: Bill[];
   @OneToOne(() => RestaurantOwner, (restaurantOwner) => restaurantOwner.author)
   owner: RestaurantOwner;
+  @OneToMany(() => Payment, (payment) => payment.author)
+  listPayment: Payment[];
+  @OneToMany(() => Comment, (comment) => comment.author)
+  listComment: Comment[];
 }

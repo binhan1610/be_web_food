@@ -50,7 +50,7 @@ export class CartService {
       detailFoodInCart.amount += Number(totalFood);
       detailFoodInCart.total += Number(totalInDetailFoodInCart);
     }
-    console.log(detailFoodInCart);
+
     cart.total += food.total * totalFood;
     try {
       await this.detailRepository.save(detailFoodInCart);
@@ -63,6 +63,7 @@ export class CartService {
       .createQueryBuilder('carts')
       .where('carts.author=:id', { id: user.id })
       .leftJoinAndSelect('carts.detailFood', 'detailFood')
+      .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
       .getOne();
     return resCart;
   }

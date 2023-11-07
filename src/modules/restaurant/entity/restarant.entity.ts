@@ -10,17 +10,24 @@ import {
 } from 'typeorm';
 import { RestaurantOwner } from './restaurantOwner.entity';
 import { Cart } from 'src/modules/cart/entities/cart.entity';
+import { Comment } from 'src/modules/comment/entity/comment.entity';
 
 @Entity({ name: 'restaurants' })
 export class Restaurant {
   @PrimaryGeneratedColumn()
   id: number;
+  @Column({ name: 'imgAvatar', nullable: true })
+  imgAvatar: string;
+  @Column({ name: 'imgBackground', nullable: true })
+  imgBackground: string;
   @Column({ name: 'restaurantName', unique: true })
   restaurantName: string;
   @Column({ name: 'address', nullable: true })
   address: string;
   @Column({ name: 'typeOfFood', nullable: true })
   typeOfFood: string;
+  @Column({ name: 'rate', nullable: true })
+  rate: number;
   @OneToMany(() => Food, (foods) => foods.restaurant, { onDelete: 'CASCADE' })
   listFood: Food[];
   @OneToOne(
@@ -35,4 +42,6 @@ export class Restaurant {
   listVoucher: Voucher[];
   @OneToMany(() => Cart, (cart) => cart.restaurant)
   listOrder: Cart[];
+  @OneToMany(() => Comment, (comment) => comment.restaurant)
+  listComment: Comment[];
 }

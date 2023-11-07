@@ -12,3 +12,7 @@ export const SALTROUNDS = parseInt(process.env.SALTROUNDS, 10);
 export const JWT_SECRET_REFRESH_TOKEN = process.env.JWT_SECRET_REFRESH_TOKEN;
 export const JWT_SECRET_EXPIRED_REFRESH_TOKEN =
   process.env.JWT_SECRET_EXPIRED_REFRESH_TOKEN;
+export const PROJECT_ID = process.env.PROJECT_ID;
+export const CLIENT_EMAIL = process.env.CLIENT_EMAIL;
+export const STORAGE_BUCKET_URL = process.env.STORAGE_BUCKET_URL;
+export const PRIVATE_KEY = process.env.PRIVATE_KEY;

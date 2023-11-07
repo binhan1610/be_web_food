@@ -10,20 +10,34 @@ export class FoodService {
     @InjectRepository(Food) private readonly foodRepository: Repository<Food>,
     private readonly restaurantServide: RestaurantService,
   ) {}
-  async addFoodToRestaurant(id: number, newFood: NewFoodDto) {
+  async addFoodToRestaurant(
+    id: number,
+    newFood: NewFoodDto,
+    destination: string,
+    imagePath: string,
+  ) {
     const restaurant = await this.restaurantServide.findOneRestaurantById(id);
+
+    let food = await this.foodRepository.findOneBy({
+      foodName: newFood.foodName,
+    });
+    const urlImage = await this.restaurantServide.uploadFile(
+      imagePath,
+      destination,
+    );
+
+    if (food) {
+      throw new HttpException('Food existed', HttpStatus.BAD_REQUEST);
+    }
     const newFoodInRestaurant = new Food();
     newFoodInRestaurant.foodName = newFood.foodName;
     newFoodInRestaurant.title = newFood.title;
-    newFoodInRestaurant.total = newFood.total;
+    newFoodInRestaurant.total = Number(newFood.total);
+    newFoodInRestaurant.img = String(urlImage);
     newFoodInRestaurant.restaurant = restaurant;
-    try {
-      await this.foodRepository.save(newFoodInRestaurant);
-      return newFoodInRestaurant;
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
-    }
+
+    await this.foodRepository.save(newFoodInRestaurant);
+    return newFoodInRestaurant;
   }
   async findFoodById(id: number) {
     const food = await this.foodRepository.findOneBy({ id });

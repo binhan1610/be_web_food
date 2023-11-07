@@ -1,3 +1,4 @@
+import { diskStorage } from 'multer';
 import { DATABASE_USERNAME } from './../../configs/config';
 import {
   Body,
@@ -9,11 +10,15 @@ import {
   HttpStatus,
   Query,
   Param,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
 import { Auth } from 'src/decorator/roles.decorator';
 import { Role } from 'src/Enum/role.enum';
 import { PaginationParams } from './dto/paginationParams.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
 @Auth(Role.Owner)
 @Controller('restaurant')
 export class RestaurantController {
@@ -55,5 +60,59 @@ export class RestaurantController {
       request.user.username,
     );
     return new HttpException(restaurant, HttpStatus.OK);
+  }
+  @Post('/avataimage/:idRestaurant')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          callback(null, Date.now() + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  async setAvatarRestaurant(
+    @UploadedFile() image,
+    @Param('idRestaurant') id: number,
+  ) {
+    const destination = `uploads/${image.originalname}`;
+    const url = await this.restaurantService.uploadFile(
+      image.path,
+      destination,
+    );
+    const restaurant = await this.restaurantService.setAvatarRestaurant(
+      id,
+      url,
+    );
+
+    return restaurant;
+  }
+  @Post('/backgroundimage/:idRestaurant')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+          callback(null, Date.now() + extname(file.originalname));
+        },
+      }),
+    }),
+  )
+  async setBackgroundRestaurant(
+    @UploadedFile() image,
+    @Param('idRestaurant') id: number,
+  ) {
+    const destination = `uploads/${image.originalname}`;
+    const url = await this.restaurantService.uploadFile(
+      image.path,
+      destination,
+    );
+    const restaurant = await this.restaurantService.setBackgroundRestaurant(
+      id,
+      url,
+    );
+
+    return restaurant;
   }
 }

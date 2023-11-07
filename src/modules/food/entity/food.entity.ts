@@ -16,6 +16,8 @@ import {
 export class Food {
   @PrimaryGeneratedColumn()
   id: number;
+  @Column({ name: 'imgfood', nullable: true })
+  img: string;
   @Column({ name: 'foodname' })
   foodName: string;
   @Column({ name: 'title' })
