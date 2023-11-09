@@ -8,6 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'vouchers' })
@@ -29,6 +30,6 @@ export class Voucher {
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.listVoucher)
   @JoinColumn({ name: 'restaurantId' })
   restaurant: Restaurant;
-  @OneToOne(() => Payment, (payment) => payment.voucher)
-  payment: Payment;
+  @OneToMany(() => Payment, (payment) => payment.voucher)
+  payment: Payment[];
 }

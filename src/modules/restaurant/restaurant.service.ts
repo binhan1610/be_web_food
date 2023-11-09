@@ -185,4 +185,8 @@ export class RestaurantService {
     await this.restaurantRepository.save(restaurant);
     return restaurant;
   }
+  public async saveRestaurant(restaurant: Restaurant) {
+    const restaurantSave = await this.restaurantRepository.save(restaurant);
+    return restaurantSave;
+  }
 }

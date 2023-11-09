@@ -16,18 +16,20 @@ export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
   @Column({ name: 'datepayment' })
-  datapayment: Date;
+  datepayment: string;
   @Column({ name: 'quantity' })
   quantity: number;
-  @Column({ name: 'paymentmethods' })
+  @Column({ name: 'paymentmethods', nullable: true })
   paymentMethods: string;
+  @Column({ name: 'status', nullable: true })
+  status: string;
   @ManyToOne(() => User, (user) => user.listPayment)
   @JoinColumn({ name: 'idUser' })
   author: User;
-  @OneToOne(() => Voucher, (voucher) => voucher.payment)
+  @ManyToOne(() => Voucher, (voucher) => voucher.payment)
   voucher: Voucher;
   @OneToOne(() => HistoryOrder, (history) => history.information)
   historyOrder: HistoryOrder;
-  @OneToOne(() => Cart, (cart) => cart.payment)
+  @ManyToOne(() => Cart, (cart) => cart.payment)
   cart: Cart;
 }

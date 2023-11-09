@@ -10,7 +10,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { DetailFoodInCart } from './detailfoodincart.entity';
-import { Bill } from 'src/modules/bill/entity/bill.entity';
+
 import { Restaurant } from 'src/modules/restaurant/entity/restarant.entity';
 import { HistoryOrder } from 'src/modules/historyorder/entity/historyorder.entity';
 import { Payment } from 'src/modules/payment/entity/payment.entity';
@@ -22,22 +22,20 @@ export class Cart {
 
   @Column({ name: 'total', default: 0 })
   total: number;
-  @Column({ name: 'status' })
+  @Column({ name: 'status', nullable: true })
   status: string;
-  @OneToOne(() => User, (user) => user.cart)
+  @ManyToOne(() => User, (user) => user.cart)
   @JoinColumn({ name: 'userId' })
   author: User;
   @OneToMany(
     () => DetailFoodInCart,
     (detailFoodInCart) => detailFoodInCart.cart,
-    { onDelete: 'CASCADE', eager: true },
+    { eager: true, onDelete: 'CASCADE' },
   )
   detailFood: DetailFoodInCart[];
-  @OneToOne(() => Bill, (bill) => bill.cart)
-  billOfCart: Bill;
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.listOrder)
   @JoinColumn({ name: 'restaurantId' })
   restaurant: Restaurant;
-  @OneToOne(() => Payment, (payment) => payment.cart)
-  payment: Payment;
+  @OneToMany(() => Payment, (payment) => payment.cart)
+  payment: Payment[];
 }

@@ -8,7 +8,7 @@ import { Food } from 'src/modules/food/entity/food.entity';
 import { DetailFoodInCart } from 'src/modules/cart/entities/detailfoodincart.entity';
 import { UserVip } from 'src/modules/user/entities/vipuser.entity';
 import { Voucher } from 'src/modules/vourcher/entity/vourcher.entity';
-import { Bill } from 'src/modules/bill/entity/bill.entity';
+
 import { RestaurantOwner } from 'src/modules/restaurant/entity/restaurantOwner.entity';
 import { UserInRestaurant } from 'src/modules/notification/entity/listuserinroom.entity';
 import { HistoryOrder } from 'src/modules/historyorder/entity/historyorder.entity';
@@ -32,7 +32,7 @@ import { Comment } from 'src/modules/comment/entity/comment.entity';
         DetailFoodInCart,
         UserVip,
         Voucher,
-        Bill,
+
         RestaurantOwner,
         UserInRestaurant,
         HistoryOrder,

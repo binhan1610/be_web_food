@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { NewVoucher } from './dto/newVoucher.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entity/vourcher.entity';
@@ -47,5 +47,10 @@ export class VoucherService {
       .skip(0)
       .getOne();
     return listVoucher;
+  }
+  public async getVoucherByIdVoucher(idVoucher: number) {
+    const voucher = await this.voucherRepository.findOneBy({ id: idVoucher });
+    if (!Voucher) throw new HttpException('Not Found', HttpStatus.BAD_REQUEST);
+    return voucher;
   }
 }

@@ -26,7 +26,13 @@ export class Restaurant {
   address: string;
   @Column({ name: 'typeOfFood', nullable: true })
   typeOfFood: string;
-  @Column({ name: 'rate', nullable: true })
+  @Column({
+    name: 'rate',
+    nullable: true,
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+  })
   rate: number;
   @OneToMany(() => Food, (foods) => foods.restaurant, { onDelete: 'CASCADE' })
   listFood: Food[];

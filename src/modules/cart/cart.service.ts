@@ -19,12 +19,12 @@ export class CartService {
     const food = await this.foodServide.findFoodById(idFood);
     const restaurant = await this.foodServide.getRestaurantByFood(idFood);
     let cart = await this.cartRepository.findOne({
-      where: { author: { id: user.id } },
+      where: { author: { id: user.id }, status: 'order' },
     });
 
     if (!cart) {
       cart = await this.cartRepository.create({
-        status: 'orderring',
+        status: 'order',
         author: user,
         detailFood: [],
         total: 0,
@@ -61,47 +61,63 @@ export class CartService {
     }
     const resCart = await this.cartRepository
       .createQueryBuilder('carts')
-      .where('carts.author=:id', { id: user.id })
+      .where('carts.author=:id AND carts.status=:status', {
+        id: user.id,
+        status: 'order',
+      })
       .leftJoinAndSelect('carts.detailFood', 'detailFood')
       .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
       .getOne();
     return resCart;
   }
 
-  async deleteCart(id: number) {
-    try {
-      await this.cartRepository.delete(id);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // async deleteCart(id: number) {
+  //   try {
+  //     // Tìm bản ghi cart cần xóa từ cơ sở dữ liệu
+  //     const cartToDelete = await this.cartRepository.findOne({ where: { id } });
+
+  //     if (cartToDelete) {
+  //       // Thực hiện xóa bản ghi cart và các bản ghi liên quan trong bảng detailFood
+  //       await this.cartRepository.remove(cartToDelete);
+  //     } else {
+  //       console.log('Bản ghi không tồn tại');
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
   async getCartByIdUser(id: number) {
-    try {
-      const detailCart = await this.cartRepository
-        .createQueryBuilder('carts')
-        .where('carts.author=:id', { id })
-        .leftJoinAndSelect('carts.detailFood', 'detailFood')
-        .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
-        .getOne();
-      return detailCart;
-      // const cart = await this.cartRepository.findOne({
-      //   where: { author: { id: id } },
-      // });
-      // return cart;
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
-    }
+    const detailCart = await this.cartRepository
+      .createQueryBuilder('carts')
+      .where('carts.id=:id AND carts.status=:status', {
+        id: id,
+        status: 'order',
+      })
+      .leftJoinAndSelect('carts.detailFood', 'detailFood')
+      .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
+      .getOne();
+    if (!detailCart) return null;
+    return detailCart;
   }
   async getIdCartByidUser(idUser: number) {
     const cart = await this.cartRepository.findOne({
-      where: { author: { id: idUser } },
+      where: { author: { id: idUser }, status: 'order' },
     });
     return cart.id;
   }
+  async getCartByUsername(username: string) {
+    const cart = await this.cartRepository.findOne({
+      where: { author: { username: username }, status: 'order' },
+    });
+    if (!cart) return null;
+    return cart;
+  }
   async deleteFoodInCart(idCart: number, idFood: number) {
     const findFood = await this.detailRepository.findOne({
-      where: { cart: { id: idCart }, foodInCart: { id: idFood } },
+      where: {
+        cart: { id: idCart, status: 'order' },
+        foodInCart: { id: idFood },
+      },
     });
     if (!findFood)
       throw new HttpException('not found food in cart', HttpStatus.NOT_FOUND);
@@ -111,14 +127,20 @@ export class CartService {
     await this.cartRepository.save(cart);
     const detailCart = await this.cartRepository
       .createQueryBuilder('carts')
-      .where('carts.id=:id', { id: idCart })
+      .where('carts.id=:id AND carts.status=:status', {
+        id: idCart,
+        status: 'order',
+      })
       .leftJoinAndSelect('carts.detailFood', 'detailFood')
       .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
       .getOne();
     return detailCart;
   }
   async increaseAmountFood(idCart: number, idFood: number) {
-    const cart = await this.cartRepository.findOneBy({ id: idCart });
+    const cart = await this.cartRepository.findOneBy({
+      id: idCart,
+      status: 'order',
+    });
     const food = await this.foodServide.findFoodById(idFood);
     const findFood = await this.detailRepository.findOne({
       where: { cart: { id: idCart }, foodInCart: { id: idFood } },
@@ -134,14 +156,20 @@ export class CartService {
     await this.cartRepository.save(cart);
     const detailCart = await this.cartRepository
       .createQueryBuilder('carts')
-      .where('carts.id=:id', { id: idCart })
+      .where('carts.id=:id AND carts.status=:status', {
+        id: idCart,
+        status: 'order',
+      })
       .leftJoinAndSelect('carts.detailFood', 'detailFood')
       .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
       .getOne();
     return detailCart;
   }
   async reduceAmountFood(idCart: number, idFood: number) {
-    const cart = await this.cartRepository.findOneBy({ id: idCart });
+    const cart = await this.cartRepository.findOneBy({
+      id: idCart,
+      status: 'order',
+    });
     const food = await this.foodServide.findFoodById(idFood);
     const findFood = await this.detailRepository.findOne({
       where: { cart: { id: idCart }, foodInCart: { id: idFood } },
@@ -159,21 +187,19 @@ export class CartService {
     await this.cartRepository.save(cart);
     const detailCart = await this.cartRepository
       .createQueryBuilder('carts')
-      .where('carts.id=:id', { id: idCart })
+      .where('carts.id=:id AND carts.status=:status', {
+        id: idCart,
+        status: 'order',
+      })
       .leftJoinAndSelect('carts.detailFood', 'detailFood')
       .leftJoinAndSelect('detailFood.foodInCart', 'foodInCart')
       .getOne();
     return detailCart;
   }
-  async ordered(username: string) {
-    const user = await this.userService.getUserByUsername(username);
-    console.log(user);
-
-    let cart = await this.getCartByIdUser(user.id);
-
+  async setDoneCart(idCart: number) {
+    const cart = await this.cartRepository.findOneBy({ id: idCart });
+    if (!cart) throw new HttpException('NOT FOUND', HttpStatus.BAD_REQUEST);
     cart.status = 'ordered';
-    await this.cartRepository.save(cart);
-
-    return cart;
+    this.cartRepository.save(cart);
   }
 }

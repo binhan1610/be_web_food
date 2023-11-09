@@ -8,7 +8,6 @@ import {
   OneToOne,
 } from 'typeorm';
 import { UserVip } from './vipuser.entity';
-import { Bill } from 'src/modules/bill/entity/bill.entity';
 import { RestaurantOwner } from 'src/modules/restaurant/entity/restaurantOwner.entity';
 import { Payment } from 'src/modules/payment/entity/payment.entity';
 import { Comment } from 'src/modules/comment/entity/comment.entity';
@@ -26,8 +25,8 @@ export class User {
   email: string;
   @Column({ name: 'refreshToken', nullable: true, select: false })
   refreshToken: string;
-  @OneToOne(() => Cart, (cart) => cart.author, { onDelete: 'CASCADE' })
-  cart: Cart;
+  @OneToMany(() => Cart, (cart) => cart.author, { onDelete: 'CASCADE' })
+  cart: Cart[];
   @Column({ name: 'roles', type: 'text', array: true, nullable: true })
   roles: string[];
   @OneToMany(() => Voucher, (voucher) => voucher.author, {
@@ -38,8 +37,6 @@ export class User {
     onDelete: 'CASCADE',
   })
   userVip: UserVip;
-  @OneToMany(() => Bill, (bill) => bill.author)
-  billOfUser: Bill[];
   @OneToOne(() => RestaurantOwner, (restaurantOwner) => restaurantOwner.author)
   owner: RestaurantOwner;
   @OneToMany(() => Payment, (payment) => payment.author)

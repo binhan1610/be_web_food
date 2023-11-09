@@ -27,15 +27,17 @@ export class CartController {
     );
     return cart;
   }
-  @Delete(':id')
-  async deleteCart(@Param('id') id: number) {
-    await this.cartService.deleteCart(id);
-    return new HttpException('Delete Success', HttpStatus.OK);
-  }
-  @Get('/:id')
-  async getDetailCartbyUserId(@Param('id') id: number) {
-    const detailCart = await this.cartService.getCartByIdUser(id);
-    return new HttpException(detailCart, HttpStatus.OK);
+  // @Get('/:id')
+  // async getDetailCartbyUserId(@Param('id') id: number) {
+  //   const detailCart = await this.cartService.getCartByIdUser(id);
+  //   return new HttpException(detailCart, HttpStatus.OK);
+  // }
+  @Get()
+  async getCartByUser(@Req() request) {
+    const cart = await this.cartService.getCartByUsername(
+      request.user.username,
+    );
+    return new HttpException(cart, HttpStatus.OK);
   }
   @Delete('/food/:idFood')
   async deleteFoodInCart(@Req() request, @Param('idFood') idFood: number) {
@@ -56,10 +58,5 @@ export class CartController {
 
     const newCart = await this.cartService.reduceAmountFood(idCart, idFood);
     return new HttpException(newCart, HttpStatus.OK);
-  }
-  @Get('/order/ordered')
-  async ordered(@Req() request) {
-    const cart = await this.cartService.ordered(request.user.username);
-    return new HttpException(cart, HttpStatus.OK);
   }
 }

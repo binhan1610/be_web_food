@@ -5,6 +5,7 @@ import { Voucher } from 'src/modules/vourcher/entity/vourcher.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,5 +17,6 @@ export class HistoryOrder {
   id: number;
 
   @OneToOne(() => Payment, (payment) => payment.historyOrder)
+  @JoinColumn({ name: 'idPayment' })
   information: Payment;
 }

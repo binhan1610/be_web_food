@@ -8,12 +8,12 @@ import { RestaurantModule } from './modules/restaurant/restaurant.module';
 import { CartModule } from './modules/cart/cart.module';
 import { FoodModule } from './modules/food/food.module';
 import { NotificationModule } from './modules/notification/notification.module';
-import { BillModule } from './modules/bill/bill.module';
 import { VoucherMoudle } from './modules/vourcher/voucher.module';
 import { HistoryOrderModule } from './modules/historyorder/historyorder.module';
-import * as admin from 'firebase-admin';
-import { STORAGE_BUCKET_URL } from './configs/config';
 import { FirebaseModule } from './firebase/firebase.module';
+
+import { CommentModule } from './modules/comment/comment.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -24,9 +24,10 @@ import { FirebaseModule } from './firebase/firebase.module';
     RestaurantModule,
     FoodModule,
     NotificationModule,
-    BillModule,
     VoucherMoudle,
     HistoryOrderModule,
+    CommentModule,
+    PaymentModule,
     FirebaseModule,
   ],
   controllers: [AppController],

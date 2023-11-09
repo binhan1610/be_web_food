@@ -16,9 +16,7 @@ export class DetailFoodInCart {
   amount: number;
   @Column({ name: 'total', nullable: true })
   total: number;
-  @ManyToOne(() => Food, (food) => food.detailFoodInCart, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Food, (food) => food.detailFoodInCart)
   @JoinColumn({ name: 'foodId' })
   foodInCart: Food;
   @ManyToOne(() => Cart, (cart) => cart.detailFood)
